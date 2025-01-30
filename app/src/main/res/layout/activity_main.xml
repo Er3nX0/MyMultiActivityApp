@@ -8,7 +8,7 @@
     <Button
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:id="@+id/buttonNavigate"
+        android:id="@+id/notification"
         android:text="Przejdź do drugiej aktywności"
         android:layout_gravity="center" />
 
