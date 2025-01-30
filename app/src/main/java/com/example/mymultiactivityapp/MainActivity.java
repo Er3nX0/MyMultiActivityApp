@@ -4,36 +4,40 @@ import android.Manifest;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
+import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.widget.Button;
 
-import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.app.NotificationCompat;
 import androidx.core.app.NotificationManagerCompat;
-import androidx.core.graphics.Insets;
-import androidx.core.view.ViewCompat;
-import androidx.core.view.WindowInsetsCompat;
+
 
 public class MainActivity extends AppCompatActivity {
-    private static final String CHANNEL_ID = "my_channel_id";
+
+    Button buttonNavigate;
+    Button notificationButton;
+    NotificationHelper notificationHelper = new NotificationHelper();
+    public static final String CHANNEL_ID = "my_channel_id";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
-        createNotificationChannel();
-        Button notify = findViewById(R.id.notification);
-        notify.setOnClickListener(v -> sendNotification());
-
+        buttonNavigate = findViewById(R.id.navigate);
+        notificationButton = findViewById(R.id.notification);
+        buttonNavigate.setOnClickListener(v -> {
+            Intent intent = new Intent(MainActivity.this, SecondActivity.class);
+            intent.putExtra("message", "Witaj z MainActivity!");
+            startActivity(intent);
+        });
+        notificationButton.setOnClickListener(v -> notificationHelper.sendNotification(this, this, "Tytuł", "Wiadomość", 3));
     }
-
-    private void createNotificationChannel() {
+    public void createNotificationChannel() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             CharSequence name = "Kanał Powiadomień";
             String description = "Opis kanału powiadomień";
@@ -45,13 +49,28 @@ public class MainActivity extends AppCompatActivity {
 
         }
     }
-
-    private void sendNotification() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            if (checkSelfPermission(android.Manifest.permission.POST_NOTIFICATIONS)
-            != PackageManager.PERMISSION_GRANTED) {
-                requestPermissions(new String[]{android.Manifest.permission.POST_NOTIFICATIONS}, 1);
+    public void sendNotification(Context context) {
+        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            if(context.checkSelfPermission(Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED) {
+                ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.POST_NOTIFICATIONS}, 1);
+                return;
             }
         }
+
+        Intent intent = new Intent(this, MainActivity.class);
+
+        PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, intent,
+                PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
+
+        NotificationCompat.Builder builder = new NotificationCompat.Builder(this, CHANNEL_ID)
+                .setSmallIcon(R.drawable.ic_launcher_background)
+                .setContentTitle("Nowe powiadomienie")
+                .setStyle(new NotificationCompat.BigTextStyle().bigText("Lorem ipsum"))
+                .setPriority(NotificationCompat.PRIORITY_DEFAULT)
+                .setContentIntent(pendingIntent)
+                .setAutoCancel(true);
+        NotificationManagerCompat notificationManager = NotificationManagerCompat.from(this);
+
+        notificationManager.notify(1, builder.build());
     }
 }
