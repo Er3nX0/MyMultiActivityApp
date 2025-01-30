@@ -35,7 +35,7 @@ public class MainActivity extends AppCompatActivity {
             intent.putExtra("message", "Witaj z MainActivity!");
             startActivity(intent);
         });
-        notificationButton.setOnClickListener(v -> notificationHelper.sendNotification(this, this, "Tytuł", "Wiadomość", 3));
+        notificationButton.setOnClickListener(v -> NotificationHelper.sendNotification(this, this, "Tytuł", "Wiadomość", 3));
     }
     public void createNotificationChannel() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
