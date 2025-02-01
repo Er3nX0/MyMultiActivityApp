@@ -10,6 +10,7 @@ import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.widget.Button;
+import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
@@ -21,7 +22,7 @@ public class MainActivity extends AppCompatActivity {
 
     Button buttonNavigate;
     Button notificationButton;
-    NotificationHelper notificationHelper = new NotificationHelper();
+    TextView imie;
     public static final String CHANNEL_ID = "my_channel_id";
 
     @Override
@@ -30,13 +31,19 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         buttonNavigate = findViewById(R.id.navigate);
         notificationButton = findViewById(R.id.notification);
+        imie = findViewById(R.id.imie);
         buttonNavigate.setOnClickListener(v -> {
             Intent intent = new Intent(MainActivity.this, SecondActivity.class);
             intent.putExtra("message", "Witaj z MainActivity!");
             startActivity(intent);
         });
-        notificationButton.setOnClickListener(v -> NotificationHelper.sendNotification(this, this, "Tytuł", "Wiadomość", 3));
+        String message = getIntent().getStringExtra("imie");
+        imie.setText(message);
+        notificationButton.setOnClickListener(v -> {
+            NotificationHelper.sendNotification(this, this, "Tytuł", "Wiadomość", 2, R.drawable.ic_launcher_background, R.raw.dzwonek);
+        });
     }
+
     public void createNotificationChannel() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             CharSequence name = "Kanał Powiadomień";
